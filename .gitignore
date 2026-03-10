@@ -8,7 +8,6 @@ config/*.p12
 config/*.json
 data/
 projectFilesBackup/
-.ruby-version
 repo*
 *.turtle
 *.swp
