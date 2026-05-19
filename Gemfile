@@ -26,6 +26,7 @@ gem 'json-ld'
 gem 'ffi', '1.15.0'
 gem 'activesupport', '~> 5.0'
 gem 'rackup'
+gem 'rubyzip', '2.4.1'
 
 
 gem 'goo', github: 'agroportal/goo', branch: 'development'
