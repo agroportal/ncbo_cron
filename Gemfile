@@ -29,7 +29,7 @@ gem 'rackup'
 
 
 gem 'goo', github: 'agroportal/goo', branch: 'development'
-gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'development'
+gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'test'
 gem 'sparql-client', github: 'agroportal/sparql-client', branch: 'development'
 gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'development'
 
