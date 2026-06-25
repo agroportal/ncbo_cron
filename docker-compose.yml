@@ -90,7 +90,7 @@ services:
     # volumes:
     #- solr_data:/var/solr/data
   agraph-ut:
-    image: franzinc/agraph:v8.3.0
+    image: franzinc/agraph:v8.1.1
     environment:
       - AGRAPH_SUPER_USER=test
       - AGRAPH_SUPER_PASSWORD=xyzzy
