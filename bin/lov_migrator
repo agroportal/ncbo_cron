@@ -1,0 +1,254 @@
+#!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: lov_migrator [options]"
+  opts.on( '-a', '--all') do 
+    options[:vocabs] = [:all]
+  end
+  opts.on('-v', '--vocabularies PREFIX1, PREFIX2', 'Comma-separated list of vocabularies to update or import') do |acronym|
+    ontologies_acronyms = acronym
+  end
+  opts.on('--dispatch-csv FILENAME', 'Specify the CSV file to dispatch') do |csv_file|
+    options[:csv_dispatch_filename] = csv_file
+  end
+  opts.on('--date DATE', 'Fetch vocabularies changed since this date (YYYY-MM-DD)') do |date|
+    begin
+      options[:date] = Date.parse(date).to_s
+    rescue ArgumentError
+      puts "Invalid date format. Please use YYYY-MM-DD."
+      exit 1
+    end
+  end
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    exit
+  end
+end.parse!
+
+raise OptionParser::MissingArgument if options[:vocabs].nil?
+
+require 'open-uri'
+require 'net/http'
+require 'json'
+require 'date'
+require 'benchmark'
+require 'csv'
+LOV_ENDPOINT = "https://lov.linkeddata.es/dataset/lov"
+CSV_ADDED_ATTRS = [ 'destination', 'who', 'comment' ]
+CSV_DISPATCH_FILENAME = 'LOV_vocabularies.csv'
+CSV_FILENAME = "vocabs.csv"
+
+module LOVMigrator
+
+  attr_accessor :lov_endpoint
+  class SparqlParser
+    attr_accessor :last_processed_date
+    
+    def initialize(endpoint, date_arg = nil)
+      @lov_endpoint = endpoint
+      @last_processed_date_file = "/var/tmp/.lov_last_processed_date.txt"
+      # Determine the last processed date
+      if date_arg
+        @last_processed_date = Date.parse(date_arg) # Use the argument if provided
+      elsif File.exist?(@last_processed_date_file)
+        @last_processed_date = Date.parse(File.read(@last_processed_date_file).strip) # Fallback to the file value
+      else
+        @last_processed_date = nil # No date available
+      end
+    end
+
+    def remote_changes?
+      return true unless @last_processed_date
+      @last_processed_date < latest_remote_modification_date
+    end
+
+    def sparql_query(query, accept_format = 'application/sparql-results+json')
+      uri = URI.parse("#{@lov_endpoint}/sparql")
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = (uri.scheme == 'https')
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if uri.scheme == 'https'
+
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.set_form_data('query' => query)
+      request['Accept'] = accept_format
+
+      response = http.request(request)
+
+      case response
+      when Net::HTTPSuccess
+        accept_format == 'application/sparql-results+json' ? parse_json_response(response.body) : response.body
+      else
+        raise "SPARQL query failed: #{response.code} #{response.message}"
+      end
+    end
+
+    def latest_remote_modification_date
+      query = <<~SPARQL
+        SELECT (MAX(?modified) AS ?lastModifiedInLOVAt)
+        WHERE {
+            ?catalog a <http://www.w3.org/ns/dcat#Catalog> .
+            ?catalog <http://purl.org/dc/terms/modified> ?modified
+        }    
+        ORDER BY DESC(?lastModifiedInLOVAt)
+      SPARQL
+      result = sparql_query(query).first
+      Date.parse(result["lastModifiedInLOVAt"]["value"])
+    end
+
+    def fetch_all_vocabs
+      query = <<~SPARQL
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX dct: <http://purl.org/dc/terms/>
+
+        SELECT DISTINCT 
+            (GROUP_CONCAT(DISTINCT STR(?_prefix); separator="\\n") AS ?prefix)
+            (GROUP_CONCAT(DISTINCT STR(?_title); separator="\\n") AS ?title)
+            (GROUP_CONCAT(DISTINCT ?_description; separator="\\n") AS ?description)
+            (GROUP_CONCAT(DISTINCT ?_keyword; separator="\\n") AS ?keyword)
+            (GROUP_CONCAT(DISTINCT ?_creatorName; separator="\\n") AS ?creator)
+            ?uri
+            (GROUP_CONCAT(DISTINCT ?_lastModifiedInLOVAt; separator="\\n") AS ?lastModifiedInLOVAt)  
+
+        {
+            ?uri a <http://purl.org/vocommons/voaf#Vocabulary> .
+            ?catalog a <http://www.w3.org/ns/dcat#CatalogRecord> . 
+            ?catalog foaf:primaryTopic ?uri .
+
+            ?uri <http://purl.org/vocab/vann/preferredNamespacePrefix> ?_prefix.
+            ?uri <http://purl.org/dc/terms/title> ?_title. 	
+            ?uri <http://purl.org/dc/terms/description> ?_description.
+            ?uri <http://www.w3.org/ns/dcat#keyword> ?_keyword.
+            OPTIONAL { 
+              ?uri dct:creator ?_creator .
+              ?_creator foaf:name ?_creatorName
+            }
+            ?catalog <http://purl.org/dc/terms/modified> ?_lastModifiedInLOVAt
+            FILTER(lang(?_title) = "en") 
+        }
+        GROUP BY ?uri ?catalog
+      SPARQL
+      response = sparql_query(query, 'text/csv')
+    end
+    def update_latest_modification_date
+      File.open(@last_processed_date_file, "w") do |file|
+        file.puts Date.today
+      end
+    end
+    
+    def fetch_latest_changed_vocabs
+      query = <<~SPARQL
+      SELECT ?catalogRecord
+      WHERE {
+          ?catalogRecord a <http://www.w3.org/ns/dcat#CatalogRecord> .
+          ?catalogRecord <http://purl.org/dc/terms/modified> ?modified.
+          FILTER(?modified > "#{@last_processed_date}"^^<http://www.w3.org/2001/XMLSchema#date>)
+      }
+      ORDER BY DESC(?modified)
+      SPARQL
+      response = sparql_query(query)
+      response.map.with_index {|response, index| "[#{index+1}] #{response['catalogRecord']['value']}"}
+    end
+    private
+
+    def parse_json_response(response_body)
+      JSON.parse(response_body)["results"]["bindings"]
+    end
+  end
+
+  class CSVGenerator
+    attr_reader :csv_file_path, :csv_content
+  
+    def initialize(csv_content, csv_file_path = nil)
+      @csv_file_path = csv_file_path
+      @csv_content = csv_content
+      @csv_file_data = load_csv_file if File.exist?(@csv_file_path)
+    end
+  
+    # Load CSV file into a hash for easy lookups
+    def load_csv_file
+      data = {}
+      CSV.foreach(@csv_file_path, headers: true) do |row|
+        data[row['prefix']] = row.to_h # assuming 'prefix' is a unique prefixentifier
+      end
+      data
+    end
+  
+    # Parse CSV string
+    def parse_csv_content
+      CSV.parse(@csv_content, headers: true)
+    end
+  
+    # Modify CSV string data based on values in the file data
+    def copy_added_values_to_csv
+      csv_data = parse_csv_content
+      if File.exist?(@csv_file_path)
+      csv_data.each do |row|
+        if @csv_file_data.key?(row['prefix'])
+          CSV_ADDED_ATTRS.each do |attr|
+            row[attr] = @csv_file_data[row['prefix']][attr]
+          end
+        end
+      end
+      end
+      csv_data
+    end
+  
+    # Save modified CSV data to a new file
+    def save_to_csv(csv_file_path = CSV_FILENAME)
+      modified_data = copy_added_values_to_csv
+      CSV.open(csv_file_path, 'w', write_headers: true, headers: modified_data.headers, force_quotes: true) do |csv|
+        modified_data.each do |row|
+          csv << row
+        end
+      end
+      puts "Modifications saved to #{csv_file_path}"
+    end
+  end
+
+
+end
+
+def logger(text, &block)
+    puts ">> #{text} starting..."
+  time = Benchmark.realtime do
+    block.call
+  end
+  puts "#{text} finished in #{time} seconds"
+end
+  
+def main(options)
+  parser = LOVMigrator::SparqlParser.new(endpoint = LOV_ENDPOINT, date_arg = options[:date])
+  logger("Checking for new changes") do
+    if not parser.remote_changes?
+      puts "No changes occured since #{parser.last_processed_date}"
+      exit  
+    else
+      if parser.last_processed_date
+        puts "The following vocabs were changed since #{parser.last_processed_date}"
+        puts parser.fetch_latest_changed_vocabs
+      end
+    end
+  end
+  vocabularies = ""
+  logger("Start fetching Vocabularies ...") do
+    vocabularies = parser.fetch_all_vocabs
+  end
+  logger("Start creating CSV #{CSV_FILENAME}") do
+    csvGen = LOVMigrator::CSVGenerator.new(vocabularies, options[:csv_dispatch_filename])
+    csvGen.save_to_csv
+  end
+  parser.update_latest_modification_date
+end
+
+main(options)
+
