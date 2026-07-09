@@ -29,8 +29,8 @@ GIT
 
 GIT
   remote: https://github.com/agroportal/ontologies_linked_data.git
-  revision: fa82f2f258852cf0fe5e8e3bfc3acbb1bf821122
-  branch: development
+  revision: e8930ca7aac154bb9b5459908f878748681220af
+  branch: feat/xls2owl-integration
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -44,6 +44,8 @@ GIT
       pony
       rack
       rack-test
+      rdf-rdfxml
+      roo
       rsolr
       rubyzip
 
@@ -219,7 +221,7 @@ GEM
       base64
     launchy (2.5.2)
       addressable (~> 2.8)
-    libxml-ruby (5.0.5)
+    libxml-ruby (5.0.6)
     link_header (0.0.8)
     logger (1.7.0)
     macaddr (1.7.2)
@@ -255,6 +257,12 @@ GEM
       net-protocol
     net-ssh (7.3.0)
     netrc (0.11.0)
+    nokogiri (1.18.10-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.18.10-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.18.10-x86_64-linux-gnu)
+      racc (~> 1.4)
     oj (3.17.3)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
@@ -272,6 +280,7 @@ GEM
       reline (>= 0.6.0)
     public_suffix (6.0.2)
     raabro (1.4.0)
+    racc (1.8.1)
     rack (3.2.6)
     rack-test (2.2.0)
       rack (>= 1.3)
@@ -319,6 +328,9 @@ GEM
       netrc (~> 0.8)
     retriable (3.4.1)
     rexml (3.4.4)
+    roo (2.10.1)
+      nokogiri (~> 1)
+      rubyzip (>= 1.3.0, < 3.0.0)
     rsolr (2.6.0)
       builder (>= 2.1.2)
       faraday (>= 0.9, < 3, != 2.0.0)
