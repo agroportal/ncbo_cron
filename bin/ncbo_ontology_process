@@ -38,6 +38,7 @@ opt_parser = OptionParser.new do |opts|
       tasks_obj[t_arr[0].to_sym] = (t_arr.length <= 1 || t_arr[1].downcase === 'true')
     }
     tasks_obj[:generate_labels] = true if tasks_obj[:process_rdf] && !tasks_obj.has_key?(:generate_labels)
+    tasks_obj[:resolve_reified_definitions] = true if tasks_obj[:process_rdf] && !tasks_obj.has_key?(:resolve_reified_definitions)
     options[:tasks].each {|k, _| options[:tasks][k] = false unless tasks_obj[k]}
   end
 
