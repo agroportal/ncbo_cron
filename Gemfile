@@ -61,4 +61,4 @@ gem "binding_of_caller", "~> 1.0"
 gem 'concurrent-ruby', '1.3.4'
 gem 'net-smtp'
 gem 'net-ftp'
-gem 'rubyzip', '= 2.4.1'
+gem 'rubyzip', '= 1.3.0'
