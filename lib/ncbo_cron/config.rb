@@ -40,6 +40,7 @@ module NcboCron
     @settings.enable_ontologies_report ||= true
     # enable index synchronization
     @settings.enable_index_synchronizer ||= true
+    @settings.enable_documentation_generation ||= true
     # enable SPAM deletion
     @settings.enable_spam_deletion ||= true
     # enable update check (vor VMs)
@@ -85,6 +86,9 @@ module NcboCron
     # Index synchronizer schedule
     # 30 3 */2 * * - run every 2 days at 3:30AM
     @settings.cron_index_synchronizer ||= "30 3 */2 * *"
+    # nightly Widoco documentation sweep
+    @settings.cron_documentation_generation ||= "15 4 * * *"
+    @settings.documentation_max_per_run ||= 20
     # 30 2 * * * - run daily at 2:30AM
     @settings.cron_spam_deletion ||= "30 2 * * *"
     # OBOFoundry synchronization report schedule
