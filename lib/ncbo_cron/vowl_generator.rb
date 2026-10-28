@@ -51,6 +51,8 @@ module NcboCron
       private
 
       def pending?(submission, force, redo_generated)
+        return false if submission.hasOntologyLanguage&.umls?
+
         unless submission.rdf_path && File.exist?(submission.rdf_path)
           @not_convertible << submission.ontology.acronym
           return false
