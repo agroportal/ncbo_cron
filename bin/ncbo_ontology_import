@@ -129,6 +129,9 @@ def upload_submission(sub_info, ontology)
   to_copy["hasOntologyLanguage"] = LinkedData::Models::OntologyFormat.where(acronym: sub_info["hasOntologyLanguage"]).first
 
   to_copy.each do |key, value|
+    # Skip attributes the source portal has and this one lacks
+    next unless new_submission.respond_to?("#{key}=")
+
     attribute_settings = new_submission.class.attribute_settings(key.to_sym)
 
     if attribute_settings
