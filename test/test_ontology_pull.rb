@@ -2,6 +2,7 @@ require_relative 'test_case'
 require 'rack'
 require 'webrick'
 require 'email_spec'
+require 'minitest/mock'
 
 class TestOntologyPull < TestCase
   include EmailSpec::Helpers
@@ -188,7 +189,42 @@ class TestOntologyPull < TestCase
     assert Pony.deliveries.empty?
   end
 
+  def test_pull_survives_gc
+    ont = init_ontologies(1)[0]
+    ont.bring(:acronym) if ont.bring?(:acronym)
+    pull = NcboCron::Models::OntologyPull.new
+
+    new_sub = gc_before_copy do
+      pull.do_ontology_pull(ont.acronym, logger: Logger.new(StringIO.new), options: {})
+    end
+
+    refute_nil new_sub
+    assert File.exist?(new_sub.uploadFilePath)
+  end
+
+  def test_helper_pull_survives_gc
+    ont = init_ontologies(1)[0]
+    ont.bring(:acronym) if ont.bring?(:acronym)
+    helper = NcboCron::Helpers::OntologyHelper
+
+    new_sub = gc_before_copy do
+      helper.do_ontology_pull(ont.acronym, false, '', Logger.new(StringIO.new), false)
+    end
+
+    refute_nil new_sub
+    assert File.exist?(new_sub.uploadFilePath)
+  end
+
   private
+
+  # Run a full GC right before the downloaded file is copied to the repository.
+  # A download Tempfile nobody references anymore is finalized (unlinked) there.
+  def gc_before_copy(&block)
+    klass = LinkedData::Models::OntologySubmission
+    copy = klass.method(:copy_file_repository)
+    gc_then_copy = ->(*args) { GC.start; copy.call(*args) }
+    klass.stub(:copy_file_repository, gc_then_copy, &block)
+  end
 
   def init_ontologies(submission_count, process_submissions = false)
     ont_count, acronyms, ontologies = LinkedData::SampleData::Ontology.create_ontologies_and_submissions(
