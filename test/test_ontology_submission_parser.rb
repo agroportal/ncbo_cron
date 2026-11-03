@@ -30,6 +30,13 @@ class TestOntologySubmissionParser < TestCase
     LinkedData::SampleData::Ontology.delete_ontologies_and_submissions
   end
 
+  # Tests share the Redis parse queue: an item one test leaves behind gets
+  # processed by the next test's process_queue_submissions
+  def setup
+    super
+    @@redis.del NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER
+  end
+
   def test_queue_submission
     parser = NcboCron::Models::OntologySubmissionParser.new
 
