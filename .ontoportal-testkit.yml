@@ -1,5 +1,6 @@
 component_name: ncbo_cron
 app_service: test-container
+dockerfile: Dockerfile.test
 backends:
   - fs
   - ag
