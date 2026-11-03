@@ -1,48 +1,23 @@
-# syntax=docker/dockerfile:1
+ARG RUBY_VERSION=3.2
+ARG DISTRO=bullseye
+ARG TESTKIT_BASE_IMAGE=ontoportal/testkit-base:ruby${RUBY_VERSION}-${DISTRO}
+FROM ${TESTKIT_BASE_IMAGE}
 
-# Build arguments with specific versions for better reproducibility
-ARG RUBY_VERSION=3.1
-ARG DISTRO_NAME=slim-bookworm
+WORKDIR /app
 
-FROM ruby:${RUBY_VERSION}-${DISTRO_NAME}
-
-WORKDIR /srv/ontoportal/ncbo_cron
-
-# Set environment variables
-ENV BUNDLE_PATH=/srv/ontoportal/bundle \
-    BUNDLE_JOBS=4 \
-    BUNDLE_RETRY=5 \
-    DEBIAN_FRONTEND=noninteractive
-
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        file \
-        ca-certificates \
-        openjdk-17-jre-headless \
-        raptor2-utils \
-        wait-for-it \
-        libraptor2-dev \
-        build-essential \
-         libxml2 \
-         libxslt-dev \
-         libmariadb-dev \
-         git \
-         curl \
-         libffi-dev \
-     pkg-config && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN gem install bundler
+# Slice size the old CI ran with (config default: 500); small slices keep goo's sliced loading exercised
+ENV GOO_SLICES=100
 
 COPY Gemfile* *.gemspec ./
 
-# Install dependencies
-RUN bundle install --jobs ${BUNDLE_JOBS} --retry ${BUNDLE_RETRY}
+# Respect the project's Bundler lock when present.
+RUN if [ -f Gemfile.lock ]; then \
+      BUNDLER_VERSION=$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1 | tr -d ' '); \
+      gem install bundler -v "$BUNDLER_VERSION"; \
+    fi
 
-# Copy application code
-COPY . .
-RUN cp /srv/ontoportal/ncbo_cron/config/config.rb.sample /srv/ontoportal/ncbo_cron/config/config.rb
+RUN bundle install --jobs 4 --retry 3
 
-CMD ["/bin/bash"]
+COPY . ./
+
+CMD ["bundle", "exec", "rake"]

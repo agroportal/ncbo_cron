@@ -48,6 +48,8 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          # ./Dockerfile is the ontoportal_testkit test image
+          file: Dockerfile.production
           platforms: linux/amd64,linux/arm64
           build-args: |
             RUBY_VERSION=3.1
