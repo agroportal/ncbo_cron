@@ -9,9 +9,11 @@ GOO_PORT              = ENV.include?("GOO_PORT")              ? ENV["GOO_PORT"] 
 MGREP_HOST            = ENV.include?("MGREP_HOST")            ? ENV["MGREP_HOST"]            : "localhost"
 MGREP_PORT            = ENV.include?("MGREP_PORT")            ? ENV["MGREP_PORT"]            : 55556
 MGREP_DICT_PATH       = ENV.include?("MGREP_DICT_PATH")       ? ENV["MGREP_DICT_PATH"]       : "./test/data/dictionary.txt"
-REDIS_GOO_CACHE_HOST  = ENV.include?("REDIS_GOO_CACHE_HOST")  ? ENV["REDIS_GOO_CACHE_HOST"]  : "localhost"
-REDIS_HTTP_CACHE_HOST = ENV.include?("REDIS_HTTP_CACHE_HOST") ? ENV["REDIS_HTTP_CACHE_HOST"] : "localhost"
-REDIS_PERSISTENT_HOST = ENV.include?("REDIS_PERSISTENT_HOST") ? ENV["REDIS_PERSISTENT_HOST"] : "localhost"
+# ontoportal_testkit sets only REDIS_HOST; the specific hosts default to it
+REDIS_HOST            = ENV.include?("REDIS_HOST")            ? ENV["REDIS_HOST"]            : "localhost"
+REDIS_GOO_CACHE_HOST  = ENV.include?("REDIS_GOO_CACHE_HOST")  ? ENV["REDIS_GOO_CACHE_HOST"]  : REDIS_HOST
+REDIS_HTTP_CACHE_HOST = ENV.include?("REDIS_HTTP_CACHE_HOST") ? ENV["REDIS_HTTP_CACHE_HOST"] : REDIS_HOST
+REDIS_PERSISTENT_HOST = ENV.include?("REDIS_PERSISTENT_HOST") ? ENV["REDIS_PERSISTENT_HOST"] : REDIS_HOST
 REDIS_PORT            = ENV.include?("REDIS_PORT")            ? ENV["REDIS_PORT"]            : 6379
 REPORT_PATH           = ENV.include?("REPORT_PATH")           ? ENV["REPORT_PATH"]           : "./test/tmp/ontologies_report.json"
 REPOSITORY_FOLDER     = ENV.include?("REPOSITORY_FOLDER")     ? ENV["REPOSITORY_FOLDER"]     : "./test/data/ontology_files/repo"
