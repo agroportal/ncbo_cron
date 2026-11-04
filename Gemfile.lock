@@ -51,8 +51,8 @@ GIT
 
 GIT
   remote: https://github.com/agroportal/ontoportal_testkit.git
-  revision: 6584c4a0b6fa41f3a03d9745fc63e8650e62e745
-  ref: 6584c4a0b6fa41f3a03d9745fc63e8650e62e745
+  revision: c73bfc6f3ce257440690e1e4bfd001f64474ec48
+  ref: c73bfc6f3ce257440690e1e4bfd001f64474ec48
   specs:
     ontoportal_testkit (0.1.0)
       rake (>= 13.0)

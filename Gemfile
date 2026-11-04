@@ -44,7 +44,7 @@ group :test do
   gem 'webmock'
   gem "minitest-hooks", "~> 1.5"
   gem 'webrick'
-  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', ref: '6584c4a0b6fa41f3a03d9745fc63e8650e62e745'
+  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', ref: 'c73bfc6f3ce257440690e1e4bfd001f64474ec48'
 end
 
 group :development do
