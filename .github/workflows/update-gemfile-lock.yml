@@ -10,7 +10,7 @@ on:
     inputs:
       gems:
         description: 'Space-separated gems to refresh'
-        default: 'ontologies_linked_data goo sparql-client ncbo_annotator'
+        default: 'ontologies_linked_data goo ncbo_annotator'
         required: true
 
 permissions:
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: '3.2'
           bundler-cache: false   # we only re-resolve, we never install the gems
 
       - name: Refresh git revisions in Gemfile.lock
