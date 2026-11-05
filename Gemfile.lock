@@ -21,8 +21,8 @@ GIT
 
 GIT
   remote: https://github.com/agroportal/ncbo_annotator.git
-  revision: aeb0222400f1b423cb865545c41233d2cbd82bfc
-  branch: development
+  revision: 64d68acfd71e4fccb3958f9256c8d8525029929f
+  branch: master
   specs:
     ncbo_annotator (0.0.1)
       goo

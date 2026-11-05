@@ -30,7 +30,7 @@ gem 'rackup'
 
 gem 'goo', github: 'agroportal/goo', branch: 'master'
 gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'master'
-gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'development'
+gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'master'
 
 # Testing
 group :test do
