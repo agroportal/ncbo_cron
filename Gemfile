@@ -29,7 +29,7 @@ gem 'rackup'
 
 
 gem 'goo', github: 'agroportal/goo', branch: 'master'
-gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'chore/owlapi-wrapper-v1.7.0'
+gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'master'
 gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'master'
 
 # Testing
