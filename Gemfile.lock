@@ -32,7 +32,7 @@ GIT
 
 GIT
   remote: https://github.com/agroportal/ontologies_linked_data.git
-  revision: 2bd9c968975ad7dfe5f6300618fa872449ccaf7b
+  revision: ea49e285761d2c76dd88c8ba2e9aec644dd2388e
   branch: chore/owlapi-wrapper-v1.7.0
   specs:
     ontologies_linked_data (0.0.1)
