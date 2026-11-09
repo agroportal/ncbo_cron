@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+
+# Configure the process for the current cron configuration.
+require_relative '../lib/ncbo_cron'
+config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
+abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
+require_relative '../config/config'
+
+require 'optparse'
+
+options = { all: false, ontologies: [], dry_run: false, force: false, redo: false, max: nil, logfile: STDOUT }
+opt_parser = OptionParser.new do |opts|
+  opts.on('-a', '--all-ontologies', 'Scan ALL ontologies for modelling pitfalls (this OR -o option required).') do
+    options[:all] = true
+  end
+
+  opts.on('-o', '--ontologies ACRONYM1,ACRONYM2,ACRONYM3',
+          'Comma-separated list of ontologies to assess (this OR -a option required).') do |acronyms|
+    options[:ontologies] = acronyms.split(",").map(&:strip)
+  end
+
+  opts.on('--dry-run', 'List the submissions that would be processed, without running OOPS.') do
+    options[:dry_run] = true
+  end
+
+  opts.on('--force', 'Also retry submissions that previously failed (ERROR_PITFALLS_OOPS).') do
+    options[:force] = true
+  end
+
+  opts.on('--redo', 'Recompute every submission, including those already scanned. ' \
+                    'Use this to refresh scores that depend on external registries.') do
+    options[:redo] = true
+  end
+
+  opts.on('--max N', Integer, 'Process at most N submissions in this run. Unlimited by default.') do |n|
+    options[:max] = n
+  end
+
+  opts.on('-l', '--logfile FILE', 'Write log to FILE (default is STDOUT)') do |filename|
+    options[:logfile] = filename
+  end
+
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+opt_parser.parse!
+
+if (options[:ontologies].empty? && !options[:all]) || (options[:all] && !options[:ontologies].empty?)
+  puts opt_parser.help
+  exit(1)
+end
+
+logger = Logger.new(options[:logfile])
+acronyms = options[:all] ? nil : options[:ontologies]
+
+generator = NcboCron::Models::OopsGenerator.new(logger, max_per_run: options[:max])
+
+if options[:dry_run]
+  pending = generator.pending(acronyms: acronyms, force: options[:force], redo_scanned: options[:redo])
+  puts "#{pending.length} submission(s) would be processed"
+  pending.each do |sub|
+    puts "  #{sub.ontology.acronym} (submission ##{sub.submissionId}) — current statuses: #{generator.status_codes(sub)}"
+  end
+  unless generator.not_scannable.empty?
+    puts "No parsed file on disk, cannot be assessed: #{generator.not_scannable.uniq.join(', ')}"
+  end
+  exit(0)
+end
+
+puts "Processing details are logged to #{options[:logfile]}" unless options[:logfile] == STDOUT
+
+generator.run(acronyms: acronyms, force: options[:force], redo_scanned: options[:redo])
+
+puts "Done. Succeeded: #{generator.processed.length} (#{generator.processed.join(', ')})"
+puts "Failed: #{generator.failed.length} (#{generator.failed.join(', ')})" unless generator.failed.empty?
+unless generator.not_scannable.empty?
+  puts "Skipped, no parsed file on disk: #{generator.not_scannable.uniq.join(', ')}"
+end
