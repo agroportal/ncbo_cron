@@ -24,12 +24,12 @@ gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
 gem 'ffi', '1.15.0'
-gem 'activesupport', '~> 5.0'
+gem 'activesupport', '~> 8.1'
 gem 'rackup'
 
 
-gem 'goo', github: 'agroportal/goo', branch: 'master'
-gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'master'
+gem 'goo', github: 'agroportal/goo', branch: 'chore/ruby-3.4.12'
+gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'chore/ruby-3.4.12'
 gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'master'
 
 # Testing
@@ -43,7 +43,7 @@ group :test do
   gem 'webmock'
   gem "minitest-hooks", "~> 1.5"
   gem 'webrick'
-  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', ref: 'c73bfc6f3ce257440690e1e4bfd001f64474ec48'
+  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', branch: 'chore/ruby-3.4.12-bookworm'
 end
 
 group :development do
