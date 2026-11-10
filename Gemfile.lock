@@ -1,11 +1,12 @@
 GIT
   remote: https://github.com/agroportal/goo.git
-  revision: 5ad999bc454d561de6e23cdf9a298d7dddfaf78d
+  revision: 8e25ea9dc014cd9530d25366b0ad1901108d1f13
   branch: master
   specs:
     goo (0.0.2)
       activesupport
       addressable (~> 2.8)
+      benchmark
       pry
       rdf
       rdf-raptor
@@ -32,12 +33,13 @@ GIT
 
 GIT
   remote: https://github.com/agroportal/ontologies_linked_data.git
-  revision: 3a42b7871a397893b14d5291a506324dd06dab04
+  revision: e94fff53f778c656b4583b976d5a562e8cf1ac9f
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
       bcrypt
+      csv
       goo
       json
       libxml-ruby
@@ -54,8 +56,8 @@ GIT
 
 GIT
   remote: https://github.com/agroportal/ontoportal_testkit.git
-  revision: c73bfc6f3ce257440690e1e4bfd001f64474ec48
-  ref: c73bfc6f3ce257440690e1e4bfd001f64474ec48
+  revision: 3f670c9b3072a3550ce706bc9283bf09a3cd9c45
+  branch: main
   specs:
     ontoportal_testkit (0.1.0)
       rake (>= 13.0)
@@ -78,11 +80,19 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (5.2.8.1)
-      concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
+    activesupport (8.1.4.1)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.3.1)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      json
+      logger (>= 1.4.2)
+      minitest (>= 5.1)
+      securerandom (>= 0.3)
+      tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     airbrussh (1.6.1)
@@ -93,6 +103,7 @@ GEM
     bcrypt_pbkdf (1.1.2)
     bcrypt_pbkdf (1.1.2-arm64-darwin)
     bcrypt_pbkdf (1.1.2-x86_64-darwin)
+    benchmark (0.5.0)
     bigdecimal (3.3.1)
     binding_of_caller (1.0.1)
       debug_inspector (>= 1.2.0)
@@ -114,6 +125,7 @@ GEM
     connection_pool (2.5.5)
     crack (0.4.5)
       rexml
+    csv (3.3.7)
     cube-ruby (0.0.3)
     dante (0.2.0)
     date (3.5.1)
@@ -121,6 +133,7 @@ GEM
     declarative (0.0.20)
     docile (1.4.1)
     domain_name (0.6.20240107)
+    drb (2.2.3)
     ed25519 (1.4.0)
     email_spec (1.6.0)
       launchy (~> 2.1)
@@ -175,6 +188,7 @@ GEM
       faraday (>= 1.0, < 3.a)
     google-cloud-errors (1.5.0)
     google-logging-utils (0.2.0)
+    google-protobuf (3.25.3)
     google-protobuf (3.25.3-arm64-darwin)
     google-protobuf (3.25.3-x86_64-darwin)
     google-protobuf (3.25.3-x86_64-linux)
@@ -236,7 +250,6 @@ GEM
       mime-types-data (~> 3.2025, >= 3.2025.0507)
     mime-types-data (3.2026.0414)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
     minitest (5.27.0)
     minitest-hooks (1.5.3)
       minitest (> 5.3)
@@ -260,8 +273,11 @@ GEM
       net-protocol
     net-ssh (7.3.0)
     netrc (0.11.0)
-    nokogiri (1.18.10)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.18.10-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.18.10-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.18.10-x86_64-linux-gnu)
       racc (~> 1.4)
     oj (3.17.3)
       bigdecimal (>= 3.0)
@@ -338,6 +354,7 @@ GEM
     rubyzip (1.3.0)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
+    securerandom (0.4.1)
     signet (0.21.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -368,13 +385,12 @@ GEM
     sys-proctable (1.3.0)
       ffi (~> 1.1)
     systemu (2.6.5)
-    thread_safe (0.3.6)
     time (0.4.2)
       date
     timeout (0.6.1)
     trailblazer-option (0.1.2)
-    tzinfo (1.2.11)
-      thread_safe (~> 0.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
     uber (0.1.0)
     uri (1.1.1)
     uuid (2.3.9)
@@ -393,7 +409,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  activesupport (~> 5.0)
+  activesupport (~> 8.1)
   bcrypt_pbkdf (>= 1.0, < 2.0)
   binding_of_caller (~> 1.0)
   capistrano (~> 3)
@@ -440,4 +456,4 @@ DEPENDENCIES
   webrick
 
 BUNDLED WITH
-   2.4.22
+  4.0.7

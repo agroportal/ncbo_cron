@@ -24,7 +24,7 @@ gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
 gem 'ffi', '1.15.0'
-gem 'activesupport', '~> 5.0'
+gem 'activesupport', '~> 8.1'
 gem 'rackup'
 
 
@@ -43,7 +43,7 @@ group :test do
   gem 'webmock'
   gem "minitest-hooks", "~> 1.5"
   gem 'webrick'
-  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', ref: 'c73bfc6f3ce257440690e1e4bfd001f64474ec48'
+  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', branch: 'main'
 end
 
 group :development do
