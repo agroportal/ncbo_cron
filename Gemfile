@@ -43,7 +43,7 @@ group :test do
   gem 'webmock'
   gem "minitest-hooks", "~> 1.5"
   gem 'webrick'
-  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', branch: 'chore/ruby-3.4.12-bookworm'
+  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', branch: 'main'
 end
 
 group :development do
