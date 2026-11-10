@@ -28,8 +28,8 @@ gem 'activesupport', '~> 8.1'
 gem 'rackup'
 
 
-gem 'goo', github: 'agroportal/goo', branch: 'chore/ruby-3.4.12'
-gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'chore/ruby-3.4.12'
+gem 'goo', github: 'agroportal/goo', branch: 'master'
+gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'master'
 gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'master'
 
 # Testing
