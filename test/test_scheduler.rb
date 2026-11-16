@@ -19,9 +19,10 @@ class TestScheduler < MiniTest::Unit::TestCase
       # Create a simple TCPServer to listen from the fork
       require 'socket'
       listen_string = ""
-      port = Random.rand(55000..65535) # http://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Dynamic.2C_private_or_ephemeral_ports
+      # Port 0: the OS picks a free port, a random pick can collide with one in use
+      server = TCPServer.new(0)
+      port = server.addr[1]
       socket_server = Thread.new do
-        server = TCPServer.new(port)
         loop {
           session = server.accept
           listen_string << session.gets
@@ -69,9 +70,10 @@ class TestScheduler < MiniTest::Unit::TestCase
       # Create a simple TCPServer to listen from the fork
       require 'socket'
       listen_string = ""
-      port = Random.rand(55000..65535) # http://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Dynamic.2C_private_or_ephemeral_ports
+      # Port 0: the OS picks a free port, a random pick can collide with one in use
+      server = TCPServer.new(0)
+      port = server.addr[1]
       socket_server = Thread.new do
-        server = TCPServer.new(port)
         loop {
           session = server.accept
           listen_string << session.gets

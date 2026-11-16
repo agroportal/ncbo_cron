@@ -24,14 +24,13 @@ gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
 gem 'ffi', '1.15.0'
-gem 'activesupport', '~> 5.0'
+gem 'activesupport', '~> 8.1'
 gem 'rackup'
 
 
 gem 'goo', github: 'agroportal/goo', branch: 'master'
 gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'master'
-gem 'sparql-client', github: 'agroportal/sparql-client', branch: 'development'
-gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'development'
+gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'master'
 
 # Testing
 group :test do
@@ -44,6 +43,7 @@ group :test do
   gem 'webmock'
   gem "minitest-hooks", "~> 1.5"
   gem 'webrick'
+  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', branch: 'main'
 end
 
 group :development do
@@ -61,4 +61,4 @@ gem "binding_of_caller", "~> 1.0"
 gem 'concurrent-ruby', '1.3.4'
 gem 'net-smtp'
 gem 'net-ftp'
-gem 'rubyzip', '= 1.3.0'
+gem 'rubyzip', '~> 3.0'

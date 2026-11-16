@@ -54,7 +54,7 @@ elsif LinkedData.settings.goo_host.include? "prod"
   platform = "prod"
 end
 $logger.info("Running on #{platform} platform; repository = #{LinkedData.settings.repository_folder}")
-unless File.exists? LinkedData.settings.repository_folder
+unless File.exist? LinkedData.settings.repository_folder
   $logger.error("Repository path does not exist: #{LinkedData.settings.repository_folder}")
   exit!
 end
