@@ -29,7 +29,7 @@ gem 'rackup'
 
 
 gem 'goo', github: 'agroportal/goo', branch: 'master'
-gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'master'
+gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'refactor/925-archive-handling'
 gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'master'
 
 # Testing
@@ -61,4 +61,4 @@ gem "binding_of_caller", "~> 1.0"
 gem 'concurrent-ruby', '1.3.4'
 gem 'net-smtp'
 gem 'net-ftp'
-gem 'rubyzip', '= 1.3.0'
+gem 'rubyzip', '~> 3.0'
