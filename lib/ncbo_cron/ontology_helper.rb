@@ -18,7 +18,6 @@ module NcboCron
         :process_annotator => true,
         :diff => true,
         :generate_foops => true,
-        :generate_oops => true,
         :remote_pull => false
       }
 
