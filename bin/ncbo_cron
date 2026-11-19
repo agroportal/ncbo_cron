@@ -105,6 +105,9 @@ opt_parser = OptionParser.new do |opts|
   opts.on("--disable-index-synchronizer", "disable search index synchronization job", "(default: #{options[:enable_index_synchronizer]})") do |v|
     options[:enable_index_synchronizer] = false
   end
+  opts.on("--disable-documentation-generation", "disable nightly Widoco documentation generation job", "(default: #{options[:enable_documentation_generation]})") do |v|
+    options[:enable_documentation_generation] = false
+  end
   opts.on("--disable-spam-deletion", "disable SPAM deletion", "(default: #{options[:enable_spam_deletion]})") do |v|
     options[:enable_spam_deletion] = false
   end
@@ -143,6 +146,9 @@ opt_parser = OptionParser.new do |opts|
   end
   opts.on("--ontologies-report SCHED", String, "cron schedule to run ontologies report generation", "(default: #{options[:cron_ontologies_report]})") do |c|
     options[:cron_ontologies_report] = c
+  end
+  opts.on("--documentation-generation SCHED", String, "cron schedule to run Widoco documentation generation", "(default: #{options[:cron_documentation_generation]})") do |c|
+    options[:cron_documentation_generation] = c
   end
   opts.on("--index-synchronizer SCHED", String, "cron schedule to run search index synchronizer", "(default: #{options[:cron_index_synchronizer]})") do |c|
     options[:cron_index_synchronizer] = c
@@ -452,6 +458,25 @@ runner.execute do |opts|
     end
   end
 
+  if options[:enable_documentation_generation]
+    documentation_generation_thread = Thread.new do
+      documentation_options = options.dup
+      documentation_options[:job_name] = "ncbo_cron_documentation_generation"
+      documentation_options[:scheduler_type] = :cron
+      documentation_options[:cron_schedule] = documentation_options[:cron_documentation_generation]
+      logger.info "Setting up documentation generation job with #{documentation_options[:cron_documentation_generation]}"; logger.flush
+      documentation_log_path = File.join(log_path, "#{log_filename_noExt}-documentation-generation.log")
+      documentation_logger = Logger.new(documentation_log_path)
+
+      NcboCron::Scheduler.scheduled_locking_job(documentation_options) do
+        logger.info "Starting documentation generation..."; logger.flush
+        logger.info "Logging documentation generation details to #{documentation_log_path}"; logger.flush
+        t0 = Time.now
+        NcboCron::Models::DocumentationGenerator.new(documentation_logger).run
+        logger.info "Documentation generation job completed in #{Time.now - t0} sec."; logger.flush
+      end
+    end
+  end
   if options[:enable_spam_deletion]
     spam_deletion_thread = Thread.new do
       spam_deletion_options = options.dup
@@ -549,6 +574,7 @@ runner.execute do |opts|
   analytics_thread.join if analytics_thread
   ontologies_report_thread.join if ontologies_report_thread
   index_synchronizer_thread.join if index_synchronizer_thread
+  documentation_generation_thread.join if documentation_generation_thread
   spam_deletion_thread.join if spam_deletion_thread
   mapping_counts_thread.join if mapping_counts_thread
   update_check_thread.join if update_check_thread
