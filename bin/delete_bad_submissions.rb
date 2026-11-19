@@ -50,7 +50,7 @@ LinkedData::Models::Ontology.all.each do |ont|
     s.bring_remaining
 
     begin
-      unless s.submissionId.is_a? Fixnum
+      unless s.submissionId.is_a? Integer
         bad_subs << s
         logger.info("Submission id is not numeric #{s.id}: #{s.submissionId.class}")
       end

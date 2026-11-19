@@ -175,8 +175,8 @@ module NcboCron
       end
 
       def new_file_exists?(file, last)
-        file = File.open(file.path, "rb")
-        remote_contents = file.read
+        # Keep returning the download Tempfile: once unreferenced, GC unlinks it before it's copied
+        remote_contents = File.binread(file.path)
         md5remote = Digest::MD5.hexdigest(remote_contents)
 
         if last.uploadFilePath && File.exist?(last.uploadFilePath)

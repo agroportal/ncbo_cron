@@ -54,7 +54,7 @@ module NcboCron
 
       private
       def read_old_data
-        return {} unless File.exists?(@data_file) && !File.zero?(@data_file)
+        return {} unless File.exist?(@data_file) && !File.zero?(@data_file)
         JSON.parse(File.read(@data_file))
       end
 
