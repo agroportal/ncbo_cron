@@ -28,9 +28,9 @@ gem 'activesupport', '~> 8.1'
 gem 'rackup'
 
 
-gem 'goo', github: 'agroportal/goo', branch: 'master'
+gem 'goo', github: 'ontoportal/goo', branch: 'master'
 gem 'ontologies_linked_data', github: 'agroportal/ontologies_linked_data', branch: 'master'
-gem 'ncbo_annotator', github: 'agroportal/ncbo_annotator', branch: 'master'
+gem 'ncbo_annotator', github: 'ontoportal/ncbo_annotator', branch: 'master'
 
 # Testing
 group :test do
@@ -43,7 +43,7 @@ group :test do
   gem 'webmock'
   gem "minitest-hooks", "~> 1.5"
   gem 'webrick'
-  gem 'ontoportal_testkit', github: 'agroportal/ontoportal_testkit', branch: 'main'
+  gem 'ontoportal_testkit', github: 'ontoportal/ontoportal_testkit', branch: 'main'
 end
 
 group :development do
