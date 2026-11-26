@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal/goo.git
-  revision: 8e25ea9dc014cd9530d25366b0ad1901108d1f13
+  revision: 02a5a1b430ddaa1fe931a7fe3dc3e29a78f5ca0f
   branch: master
   specs:
     goo (0.0.2)
